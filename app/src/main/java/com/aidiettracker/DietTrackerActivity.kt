@@ -2,18 +2,34 @@ package com.aidiettracker
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.aidiettracker.data.NutritionGoalCalculator
+import com.aidiettracker.data.ai.AiIndianSuggestor
+import com.aidiettracker.data.food.FoodLookupService
+import com.aidiettracker.data.local.LocalProfileStore
+import com.aidiettracker.data.model.DietPreference
+import com.aidiettracker.data.model.UserProfile
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 data class MealEntry(
     val name: String,
@@ -28,11 +44,12 @@ data class MealEntry(
 class DietTrackerActivity : AppCompatActivity() {
 
     private val meals = mutableListOf<MealEntry>()
+    private var currentProfile: UserProfile? = null
     private var waterCount = 0
-    private val dailyCalorieGoal = 2000
-    private val dailyProteinGoal = 150
-    private val dailyCarbsGoal = 250
-    private val dailyFatGoal = 65
+    private var dailyCalorieGoal = 2000
+    private var dailyProteinGoal = 150
+    private var dailyCarbsGoal = 250
+    private var dailyFatGoal = 65
 
     private lateinit var tvDate: TextView
     private lateinit var tvStreak: TextView
@@ -49,13 +66,13 @@ class DietTrackerActivity : AppCompatActivity() {
     private lateinit var progressCarbs: ProgressBar
     private lateinit var progressFat: ProgressBar
 
-    private lateinit var etMealName: TextInputEditText
-    private lateinit var etCalories: TextInputEditText
-    private lateinit var etProtein: TextInputEditText
-    private lateinit var etCarbs: TextInputEditText
-    private lateinit var etFat: TextInputEditText
+    private lateinit var etMealName: AutoCompleteTextView
+    private lateinit var etQuantity: TextInputEditText
+    private lateinit var actQuantityUnit: AutoCompleteTextView
+    private lateinit var tvFoodLookupStatus: TextView
     private lateinit var chipGroupMealType: ChipGroup
     private lateinit var btnAddMeal: MaterialButton
+    private lateinit var foodSuggestionsAdapter: ArrayAdapter<String>
 
     private lateinit var tvMealCount: TextView
     private lateinit var layoutEmptyState: LinearLayout
@@ -68,15 +85,18 @@ class DietTrackerActivity : AppCompatActivity() {
     private lateinit var btnRemoveWater: MaterialButton
     private lateinit var btnResetDay: MaterialButton
 
-    private val prefs by lazy { getSharedPreferences("diet_tracker_prefs", Context.MODE_PRIVATE) }
+    private val prefs by lazy { getSharedPreferences("diet_tracker_prefs", MODE_PRIVATE) }
     private val todayKey get() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diet_tracker)
         bindViews()
+        currentProfile = LocalProfileStore.load(this)
+        loadGoalsFromProfile()
         setupDate()
         loadData()
+        setupFoodInputs()
         setupListeners()
         buildWaterGlasses()
         refreshUI()
@@ -97,22 +117,92 @@ class DietTrackerActivity : AppCompatActivity() {
         progressProtein = findViewById(R.id.progress_protein)
         progressCarbs = findViewById(R.id.progress_carbs)
         progressFat = findViewById(R.id.progress_fat)
+
         etMealName = findViewById(R.id.et_meal_name)
-        etCalories = findViewById(R.id.et_calories)
-        etProtein = findViewById(R.id.et_protein)
-        etCarbs = findViewById(R.id.et_carbs)
-        etFat = findViewById(R.id.et_fat)
+        etQuantity = findViewById(R.id.et_quantity)
+        actQuantityUnit = findViewById(R.id.act_quantity_unit)
+        tvFoodLookupStatus = findViewById(R.id.tv_food_lookup_status)
         chipGroupMealType = findViewById(R.id.chip_group_meal_type)
         btnAddMeal = findViewById(R.id.btn_add_meal)
+
         tvMealCount = findViewById(R.id.tv_meal_count)
         layoutEmptyState = findViewById(R.id.layout_empty_state)
         layoutMealsContainer = findViewById(R.id.layout_meals_container)
+
         tvWaterCount = findViewById(R.id.tv_water_count)
         layoutWaterGlasses = findViewById(R.id.layout_water_glasses)
         progressWater = findViewById(R.id.progress_water)
         btnAddWater = findViewById(R.id.btn_add_water)
         btnRemoveWater = findViewById(R.id.btn_remove_water)
         btnResetDay = findViewById(R.id.btn_reset_day)
+    }
+
+    private fun loadGoalsFromProfile() {
+        val profile = currentProfile ?: LocalProfileStore.load(this) ?: return
+        currentProfile = profile
+        val goals = NutritionGoalCalculator.calculate(profile)
+        dailyCalorieGoal = goals.caloriesTarget
+        dailyProteinGoal = goals.proteinGrams
+        dailyCarbsGoal = goals.carbsGrams
+        dailyFatGoal = goals.fatGrams
+    }
+
+    private fun setupFoodInputs() {
+        val vegOnly = currentProfile?.dietPreference == DietPreference.VEG_ONLY
+        foodSuggestionsAdapter = ArrayAdapter(
+            this,
+            R.layout.item_food_dropdown,
+            FoodLookupService.defaultSuggestions()
+                .filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
+                .toMutableList()
+        )
+        etMealName.setAdapter(foodSuggestionsAdapter)
+        etMealName.setDropDownBackgroundResource(R.drawable.bg_dark_card)
+        etMealName.threshold = 1
+
+        etMealName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val suggestions = FoodLookupService.searchSuggestions(s?.toString().orEmpty())
+                    .filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
+                foodSuggestionsAdapter.clear()
+                foodSuggestionsAdapter.addAll(suggestions)
+                foodSuggestionsAdapter.notifyDataSetChanged()
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+
+        val units = listOf("g", "serving", "roti", "bowl", "piece")
+        val unitAdapter = ArrayAdapter(this, R.layout.item_food_dropdown, units)
+        actQuantityUnit.setAdapter(unitAdapter)
+        actQuantityUnit.setDropDownBackgroundResource(R.drawable.bg_dark_card)
+        actQuantityUnit.setOnClickListener { actQuantityUnit.showDropDown() }
+        actQuantityUnit.setText("g", false)
+
+        bindQuickPickChips()
+    }
+
+    private fun bindQuickPickChips() {
+        val quickFoodChips = listOf(
+            R.id.chip_dal_baati,
+            R.id.chip_gatte,
+            R.id.chip_ker_sangri,
+            R.id.chip_bajre_roti,
+            R.id.chip_pyaaz_kachori,
+            R.id.chip_mirchi_vada,
+            R.id.chip_lal_maas
+        )
+
+        quickFoodChips.forEach { chipId ->
+            findViewById<Chip>(chipId).setOnClickListener { view ->
+                val chip = view as Chip
+                etMealName.setText(chip.text?.toString().orEmpty(), false)
+                etMealName.setSelection(etMealName.text?.length ?: 0)
+                tvFoodLookupStatus.text = "Selected ${chip.text}. Enter quantity to calculate macros."
+            }
+        }
     }
 
     private fun setupDate() {
@@ -126,7 +216,8 @@ class DietTrackerActivity : AppCompatActivity() {
             if (waterCount < 8) {
                 waterCount++
                 saveData()
-                refreshUI()}
+                refreshUI()
+            }
         }
         btnRemoveWater.setOnClickListener {
             if (waterCount > 0) {
@@ -149,38 +240,81 @@ class DietTrackerActivity : AppCompatActivity() {
     }
 
     private fun addMeal() {
-        val name = etMealName.text.toString().trim()
-        val caloriesStr = etCalories.text.toString().trim()
-        val proteinStr = etProtein.text.toString().trim()
-        val carbsStr = etCarbs.text.toString().trim()
-        val fatStr = etFat.text.toString().trim()
+        val foodName = etMealName.text.toString().trim()
+        val quantity = etQuantity.text.toString().trim().toDoubleOrNull()
+        val unit = actQuantityUnit.text.toString().trim().ifBlank { "g" }
 
-        if (name.isEmpty()) { etMealName.error = "Enter meal name"; return }
-        if (caloriesStr.isEmpty()) { etCalories.error = "Enter calories"; return }
+        if (foodName.isEmpty()) {
+            etMealName.error = "Enter food name"
+            return
+        }
+        if (quantity == null || quantity <= 0.0) {
+            etQuantity.error = "Enter valid quantity"
+            return
+        }
 
-        val meal = MealEntry(
-            name = name,
-            calories = caloriesStr.toIntOrNull() ?: 0,
-            protein = proteinStr.toFloatOrNull() ?: 0f,
-            carbs = carbsStr.toFloatOrNull() ?: 0f,
-            fat = fatStr.toFloatOrNull() ?: 0f,
-            mealType = getMealType(),
-            time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-        )
+        btnAddMeal.isEnabled = false
+        tvFoodLookupStatus.text = "Calculating nutrition..."
 
-        meals.add(meal)
-        saveData()
-        clearInputs()
-        refreshUI()
-        Toast.makeText(this, "✅ ${meal.name} logged!", Toast.LENGTH_SHORT).show()
+        Thread {
+            val nutrition = FoodLookupService.resolveNutrition(foodName, quantity, unit)
+            runOnUiThread {
+                btnAddMeal.isEnabled = true
+
+                if (nutrition == null) {
+                    tvFoodLookupStatus.text = "Food not found. Try another name or use grams for better accuracy."
+                    Toast.makeText(this, "Could not fetch nutrition", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+
+                if (currentProfile?.dietPreference == DietPreference.VEG_ONLY && !FoodLookupService.isVegetarianFoodName(nutrition.displayName)) {
+                    tvFoodLookupStatus.text = "This looks non-veg. Profile is set to Veg Only."
+                    Toast.makeText(this, "Veg-only profile: non-veg item blocked", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+
+                val meal = MealEntry(
+                    name = nutrition.displayName,
+                    calories = nutrition.calories,
+                    protein = nutrition.protein,
+                    carbs = nutrition.carbs,
+                    fat = nutrition.fat,
+                    mealType = getMealType(),
+                    time = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
+                )
+
+                meals.add(meal)
+                saveData()
+                clearInputs()
+                refreshUI()
+                val sourceLabel = when (nutrition.source) {
+                    "local" -> "local Indian DB"
+                    "cache" -> "cached fallback result"
+                    else -> "online fallback"
+                }
+                val totalProtein = meals.sumOf { it.protein.toDouble() }.toInt()
+                val totalCarbs = meals.sumOf { it.carbs.toDouble() }.toInt()
+                val totalFat = meals.sumOf { it.fat.toDouble() }.toInt()
+                val buddyTip = currentProfile?.let {
+                    AiIndianSuggestor.suggestMealAddOn(
+                        profile = it,
+                        mealName = meal.name,
+                        proteinGap = (dailyProteinGoal - totalProtein).coerceAtLeast(0),
+                        carbsGap = (dailyCarbsGoal - totalCarbs).coerceAtLeast(0),
+                        fatGap = (dailyFatGoal - totalFat).coerceAtLeast(0)
+                    )
+                } ?: "${AiIndianSuggestor.buddyName()}: Add a fruit and salad for better micronutrients."
+
+                tvFoodLookupStatus.text = "Used $sourceLabel for ${meal.name}.\n$buddyTip"
+                Toast.makeText(this, "${meal.name} logged", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
     }
 
     private fun clearInputs() {
-        etMealName.text?.clear()
-        etCalories.text?.clear()
-        etProtein.text?.clear()
-        etCarbs.text?.clear()
-        etFat.text?.clear()
+        etMealName.setText("")
+        etQuantity.text?.clear()
+        actQuantityUnit.setText("g", false)
     }
 
     private fun refreshUI() {
@@ -194,8 +328,11 @@ class DietTrackerActivity : AppCompatActivity() {
 
         tvCaloriesConsumed.text = totalCalories.toString()
         tvCaloriesGoal.text = " / $dailyCalorieGoal kcal"
-        tvCaloriesRemaining.text = if (totalCalories <= dailyCalorieGoal)
-            "$remaining kcal remaining" else "${totalCalories - dailyCalorieGoal} kcal over goal"
+        tvCaloriesRemaining.text = if (totalCalories <= dailyCalorieGoal) {
+            "$remaining kcal remaining"
+        } else {
+            "${totalCalories - dailyCalorieGoal} kcal over goal"
+        }
         tvCaloriesPercent.text = "$caloriePercent%"
         progressCalories.progress = caloriePercent
         progressBarCalories.progress = caloriePercent
@@ -332,15 +469,17 @@ class DietTrackerActivity : AppCompatActivity() {
         val jsonArray = JSONArray(mealsJson)
         for (i in 0 until jsonArray.length()) {
             val obj = jsonArray.getJSONObject(i)
-            meals.add(MealEntry(
-                name = obj.getString("name"),
-                calories = obj.getInt("calories"),
-                protein = obj.getDouble("protein").toFloat(),
-                carbs = obj.getDouble("carbs").toFloat(),
-                fat = obj.getDouble("fat").toFloat(),
-                mealType = obj.getString("mealType"),
-                time = obj.getString("time")
-            ))
+            meals.add(
+                MealEntry(
+                    name = obj.getString("name"),
+                    calories = obj.getInt("calories"),
+                    protein = obj.getDouble("protein").toFloat(),
+                    carbs = obj.getDouble("carbs").toFloat(),
+                    fat = obj.getDouble("fat").toFloat(),
+                    mealType = obj.getString("mealType"),
+                    time = obj.getString("time")
+                )
+            )
         }
     }
 }

@@ -340,16 +340,17 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:theme="@style/OrangeInputTheme">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <AutoCompleteTextView
                     android:id="@+id/et_meal_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Meal name"
                     android:inputType="textCapWords"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_secondary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Macro Inputs Row 1 -->
+            <!-- Quantity Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -361,12 +362,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:hint="Calories"
+                    android:hint="Quantity"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:theme="@style/OrangeInputTheme">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_calories"
+                        android:id="@+id/et_quantity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
@@ -379,63 +380,133 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:hint="Protein (g)"
+                    android:hint="Unit"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:theme="@style/OrangeInputTheme">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_protein"
+                    <AutoCompleteTextView
+                        android:id="@+id/act_quantity_unit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
+                        android:hint="Unit"
+                        android:inputType="none"
+                        android:text="g"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_secondary" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Macro Inputs Row 2 -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/tv_food_lookup_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="10dp"
+                android:text="Search an Indian food, enter quantity, and we will auto-calculate macros."
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Popular Rajasthani Foods"
+                android:textColor="@color/orange_primary"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/chip_group_rajasthani"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:hint="Carbs (g)"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:theme="@style/OrangeInputTheme">
+                    app:singleSelection="false">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_carbs"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_dal_baati"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_secondary" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="Dal Baati Churma"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:hint="Fat (g)"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:theme="@style/OrangeInputTheme">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_fat"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_gatte"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_secondary" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
+                        android:text="Gatte ki Sabzi"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_ker_sangri"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ker Sangri"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_bajre_roti"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bajre ki Roti"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_pyaaz_kachori"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pyaz Kachori"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_mirchi_vada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mirchi Vada"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_lal_maas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Laal Maas"
+                        android:textColor="@android:color/white"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:chipBackgroundColor="#4DFF6B00"
+                        app:chipStrokeColor="#99FFFFFF"
+                        app:chipStrokeWidth="1dp" />
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
 
             <!-- Meal Type Chips -->
             <HorizontalScrollView
@@ -457,10 +528,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🌅 Breakfast"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@android:color/white"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
-                        app:chipBackgroundColor="#1AFF6B00"
-                        app:chipStrokeColor="@color/orange_primary"
+                        app:chipBackgroundColor="#33FF6B00"
+                        app:chipStrokeColor="#66FFFFFF"
                         app:chipStrokeWidth="1dp"
                         android:checked="true" />
 
@@ -469,10 +540,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="☀️ Lunch"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@android:color/white"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
-                        app:chipBackgroundColor="#1AFF6B00"
-                        app:chipStrokeColor="@color/orange_primary"
+                        app:chipBackgroundColor="#33FF6B00"
+                        app:chipStrokeColor="#66FFFFFF"
                         app:chipStrokeWidth="1dp" />
 
                     <com.google.android.material.chip.Chip
@@ -480,10 +551,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🌙 Dinner"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@android:color/white"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
-                        app:chipBackgroundColor="#1AFF6B00"
-                        app:chipStrokeColor="@color/orange_primary"
+                        app:chipBackgroundColor="#33FF6B00"
+                        app:chipStrokeColor="#66FFFFFF"
                         app:chipStrokeWidth="1dp" />
 
                     <com.google.android.material.chip.Chip
@@ -491,10 +562,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🍎 Snack"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@android:color/white"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
-                        app:chipBackgroundColor="#1AFF6B00"
-                        app:chipStrokeColor="@color/orange_primary"
+                        app:chipBackgroundColor="#33FF6B00"
+                        app:chipStrokeColor="#66FFFFFF"
                         app:chipStrokeWidth="1dp" />
                 </com.google.android.material.chip.ChipGroup>
             </HorizontalScrollView>

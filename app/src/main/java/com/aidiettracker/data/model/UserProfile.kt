@@ -6,7 +6,9 @@ data class UserProfile(
     val age: Int = 0,
     val heightCm: Double = 0.0,
     val weightKg: Double = 0.0,
+    val targetWeightKg: Double = 0.0,
     val bodyType: BodyType = BodyType.MESOMORPH,
+    val dietPreference: DietPreference = DietPreference.NON_VEG,
     val activityLevel: ActivityLevel = ActivityLevel.MODERATE,
     val goal: Goal = Goal.MAINTAIN,
     val bmi: Double = 0.0,
@@ -24,6 +26,11 @@ enum class ActivityLevel {
     LIGHT,
     MODERATE,
     ACTIVE
+}
+
+enum class DietPreference {
+    VEG_ONLY,
+    NON_VEG
 }
 
 enum class Goal {

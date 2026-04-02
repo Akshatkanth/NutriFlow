@@ -92,16 +92,17 @@
                     android:id="@+id/text_calories_consumed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="840"
+                    android:text="0"
                     android:textColor="@android:color/white"
                     android:textSize="42sp"
                     android:fontFamily="sans-serif-black" />
 
                 <TextView
+                    android:id="@+id/text_calories_target"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="/ 2,100 kcal"
+                    android:text="/ 0 kcal"
                     android:textColor="#99FFFFFF"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -117,10 +118,11 @@
                 android:progressDrawable="@drawable/bg_progress_bar" />
 
             <TextView
+                android:id="@+id/text_calories_remaining"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="1,260 kcal remaining"
+                android:text="0 kcal remaining"
                 android:textColor="#99FFFFFF"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -163,16 +165,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="22.3"
+                    android:text="--"
                     android:textColor="@android:color/white"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-black" />
 
                 <TextView
+                    android:id="@+id/text_bmi_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Healthy"
+                    android:text="--"
                     android:textColor="@color/orange_primary"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-medium" />
@@ -200,7 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="4 / 8"
+                    android:text="0 / 8"
                     android:textColor="@android:color/white"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-black" />
@@ -237,16 +240,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="3.2k"
+                    android:text="0"
                     android:textColor="@android:color/white"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-black" />
 
                 <TextView
+                    android:id="@+id/text_steps_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="of 10k"
+                    android:text="day streak"
                     android:textColor="@color/orange_primary"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-medium" />
@@ -289,18 +293,20 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/text_protein_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="62g / 140g"
+                    android:text="0g / 0g"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout><ProgressBar
+            android:id="@+id/progress_protein"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginBottom="16dp"
             android:max="100"
-            android:progress="44"
+            android:progress="0"
             android:progressDrawable="@drawable/bg_progress_bar" />
 
             <!-- Carbs -->
@@ -320,20 +326,22 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/text_carbs_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="110g / 250g"
+                    android:text="0g / 0g"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
 
             <ProgressBar
+                android:id="@+id/progress_carbs"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
                 android:layout_marginBottom="16dp"
                 android:max="100"
-                android:progress="44"
+                android:progress="0"
                 android:progressDrawable="@drawable/bg_progress_bar" />
 
             <!-- Fats -->
@@ -353,19 +361,21 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/text_fat_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="28g / 65g"
+                    android:text="0g / 0g"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
 
             <ProgressBar
+                android:id="@+id/progress_fat"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
                 android:max="100"
-                android:progress="43"
+                android:progress="0"
                 android:progressDrawable="@drawable/bg_progress_bar" />
         </LinearLayout>
 
