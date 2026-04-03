@@ -5,7 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="AI Diet Tracker"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AIDietTracker">
         <activity
@@ -19,6 +19,12 @@
             android:exported="false" />
         <activity
             android:name=".ui.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.OnboardingSplashActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.AuthEntryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.RegisterActivity"

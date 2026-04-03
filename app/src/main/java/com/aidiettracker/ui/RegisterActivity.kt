@@ -2,11 +2,17 @@ package com.aidiettracker.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.widget.Toast
+import android.view.View
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import com.aidiettracker.R
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
+import android.widget.EditText
 import com.google.firebase.auth.FirebaseAuth
 
 class RegisterActivity : AppCompatActivity() {
@@ -19,9 +25,31 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        val emailField = findViewById<TextInputEditText>(R.id.edit_email)
-        val passwordField = findViewById<TextInputEditText>(R.id.edit_password)
-        val nameField = findViewById<TextInputEditText>(R.id.edit_name)
+        findViewById<View>(R.id.button_back)?.setOnClickListener { finish() }
+        findViewById<TextView>(R.id.button_login)?.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
+
+        val emailField = findViewById<EditText>(R.id.edit_email)
+        val passwordField = findViewById<EditText>(R.id.edit_password)
+        val nameField = findViewById<EditText>(R.id.edit_name)
+        val passwordUnderline = findViewById<View>(R.id.view_password_underline)
+
+        val underlineTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                val lineColor = if (s.isNullOrBlank()) R.color.auth_divider else R.color.onboarding_cta_green
+                passwordUnderline.setBackgroundColor(ContextCompat.getColor(this@RegisterActivity, lineColor))
+            }
+        }
+        passwordField.addTextChangedListener(underlineTextWatcher)
+        underlineTextWatcher.afterTextChanged(passwordField.text)
+
+        findViewById<TextView?>(R.id.text_terms)?.movementMethod = LinkMovementMethod.getInstance()
 
         findViewById<MaterialButton>(R.id.button_create_account).setOnClickListener {
             val email = emailField.text.toString().trim()
@@ -33,8 +61,8 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (password.length < 6) {
-                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+            if (password.length < 8) {
+                Toast.makeText(this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -49,9 +77,5 @@ class RegisterActivity : AppCompatActivity() {
                 }
         }
 
-        findViewById<MaterialButton>(R.id.button_login).setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
     }
 }
