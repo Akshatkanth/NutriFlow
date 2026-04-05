@@ -18,3 +18,4 @@ local.properties
 /app/google-services.json
 secrets.properties
 .env
+local.properties

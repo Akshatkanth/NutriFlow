@@ -60,7 +60,7 @@ class DietPlanActivity : AppCompatActivity() {
     }
 
     private fun showQuickActions() {
-        val options = arrayOf("Track diet", "View plan", "Open profile")
+        val options = arrayOf("Track diet", "View plan", "Open profile", "Chat with coach")
         AlertDialog.Builder(this)
             .setTitle("Quick actions")
             .setItems(options) { _, which ->
@@ -68,6 +68,7 @@ class DietPlanActivity : AppCompatActivity() {
                     0 -> startActivitySmooth(com.aidiettracker.DietTrackerActivity::class.java)
                     1 -> findViewById<android.widget.ScrollView>(R.id.diet_plan_scroll).smoothScrollTo(0, 0)
                     2 -> startActivitySmooth(ProfilePageActivity::class.java)
+                    3 -> startActivitySmooth(ChatbotActivity::class.java)
                 }
             }
             .show()

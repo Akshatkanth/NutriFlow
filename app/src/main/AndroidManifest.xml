@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIDietTracker">
         <activity
+            android:name=".ui.ChatbotActivity"
+            android:exported="false" />
+        <activity
             android:name=".DietTrackerActivity"
             android:exported="false" />
         <activity

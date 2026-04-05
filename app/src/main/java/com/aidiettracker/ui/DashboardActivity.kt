@@ -65,15 +65,20 @@ class DashboardActivity : AppCompatActivity() {
             showQuickActions()
         }
 
+        findViewById<TextView>(R.id.text_chat_shortcut).setOnClickListener {
+            startActivitySmooth(ChatbotActivity::class.java)
+        }
+
         findViewById<LinearLayout>(R.id.nav_home).attachTapFeedback()
         findViewById<LinearLayout>(R.id.nav_view_plan).attachTapFeedback()
         findViewById<LinearLayout>(R.id.nav_track_diet).attachTapFeedback()
         findViewById<LinearLayout>(R.id.nav_profile).attachTapFeedback()
         findViewById<FrameLayout>(R.id.nav_quick_actions).attachTapFeedback()
+        findViewById<TextView>(R.id.text_chat_shortcut).attachTapFeedback()
     }
 
     private fun showQuickActions() {
-        val options = arrayOf("Track diet", "View plan", "Open profile")
+        val options = arrayOf("Track diet", "View plan", "Open profile", "Chat with coach")
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Quick actions")
             .setItems(options) { _, which ->
@@ -81,6 +86,7 @@ class DashboardActivity : AppCompatActivity() {
                     0 -> startActivitySmooth(DietTrackerActivity::class.java)
                     1 -> startActivitySmooth(DietPlanActivity::class.java)
                     2 -> startActivitySmooth(ProfilePageActivity::class.java)
+                    3 -> startActivitySmooth(ChatbotActivity::class.java)
                 }
             }
             .show()

@@ -14,4 +14,19 @@
 	<string name="auth_login">Log in</string>
 	<string name="auth_register">Create Account</string>
 	<string name="auth_terms">By continuing, you agree to NutriFlow\'s <u>Terms &amp; Conditions</u> and <u>Privacy Policy</u></string>
+	<string name="chatbot_title">NutriFlow AI Coach</string>
+	<string name="chatbot_hint">Ask about meals, calories, protein, hydration...</string>
+	<string name="chatbot_send">Send message</string>
+	<string name="chatbot_back">Go back</string>
+	<string name="chatbot_status_ready">Ready</string>
+	<string name="chatbot_status_thinking">Thinking...</string>
+	<string name="chatbot_status_empty">No reply generated.</string>
+	<string name="chatbot_status_failed">Request failed.</string>
+	<string name="chatbot_status_timeout">Request timed out. Try a shorter prompt.</string>
+	<string name="chatbot_status_http_error">Request failed (%1$d)</string>
+	<string name="chatbot_missing_key">Set NIM_API_KEY in local.properties to use chat.</string>
+	<string name="chatbot_welcome_message">Hi, I am your NutriFlow coach. Tell me what you ate or your goal, and I will suggest next steps.</string>
+	<string name="chatbot_error_generic">I could not complete that request. Please try again.</string>
+	<string name="chatbot_error_empty">I did not get a useful response. Please rephrase your question.</string>
+	<string name="chatbot_error_network">Network issue while contacting AI coach. Please check connection and try again.</string>
 </resources>

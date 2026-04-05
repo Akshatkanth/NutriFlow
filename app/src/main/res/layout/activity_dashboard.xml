@@ -59,14 +59,20 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/text_chat_shortcut"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_dashboard_header_chip"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/ic_chat"
+                    android:drawablePadding="6dp"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:paddingStart="14dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="14dp"
                     android:paddingBottom="8dp"
-                    android:text="Today"
+                    android:text="Ask AI"
                     android:textColor="#0f100f"
                     android:textSize="13sp"
                     android:textStyle="bold" />

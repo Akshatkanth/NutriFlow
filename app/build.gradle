@@ -4,6 +4,18 @@ plugins {
     id "com.google.gms.google-services"
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { stream ->
+        localProperties.load(stream)
+    }
+}
+
+def nimApiKey = (localProperties.getProperty("NIM_API_KEY") ?: "")
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+
 android {
     namespace "com.aidiettracker"
     compileSdk 34
@@ -14,6 +26,10 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "NIM_API_KEY", "\"${nimApiKey}\""
+        buildConfigField "String", "NIM_BASE_URL", "\"https://integrate.api.nvidia.com/\""
+        buildConfigField "String", "NIM_MODEL", "\"meta/llama-3.1-70b-instruct\""
     }
 
     buildTypes {
@@ -31,6 +47,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
@@ -44,5 +64,8 @@ dependencies {
     implementation "com.google.firebase:firebase-auth"
     implementation "com.google.firebase:firebase-firestore"
     implementation 'androidx.activity:activity:1.8.0'
+
+    implementation "com.squareup.retrofit2:retrofit:2.11.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.11.0"
 }
 
