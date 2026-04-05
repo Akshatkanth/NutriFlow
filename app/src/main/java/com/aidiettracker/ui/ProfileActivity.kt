@@ -1,6 +1,5 @@
 package com.aidiettracker.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -12,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.appcompat.app.AppCompatActivity
 import com.aidiettracker.R
 import com.aidiettracker.data.BmiCalculator
@@ -286,9 +286,13 @@ class ProfileActivity : AppCompatActivity() {
     private fun applySelectionStyles(selectedIndex: Int) {
         val options = listOf(optionOne, optionTwo, optionThree)
         options.forEachIndexed { index, view ->
-            val visible = view.visibility == View.VISIBLE
+            val visible = view.isVisible
             val selected = visible && index == selectedIndex
             view.isSelected = selected
+            view.setBackgroundResource(
+                if (selected) R.drawable.bg_profile_option_card_active else R.drawable.bg_profile_option_card
+            )
+            view.alpha = if (selected) 1f else 0.9f
             view.setTextColor(
                 ContextCompat.getColor(
                     this,
@@ -317,6 +321,7 @@ class ProfileActivity : AppCompatActivity() {
 
         val enabled = isStepAnswered(currentStep)
         buttonNext.isEnabled = enabled
+        buttonNext.alpha = if (enabled) 1f else 0.65f
         buttonNext.backgroundTintList = ContextCompat.getColorStateList(
             this,
             if (enabled) R.color.onboarding_cta_green else R.color.auth_divider
@@ -373,7 +378,7 @@ class ProfileActivity : AppCompatActivity() {
         LocalProfileStore.save(this, profile)
 
         Toast.makeText(this, "Profile saved. BMI: $bmi", Toast.LENGTH_SHORT).show()
-        startActivitySmooth(DashboardActivity::class.java)
+        startActivitySmooth(ProfilePageActivity::class.java)
         finish()
     }
 }

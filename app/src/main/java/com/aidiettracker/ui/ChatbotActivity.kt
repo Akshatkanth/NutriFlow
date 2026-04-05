@@ -2,12 +2,12 @@ package com.aidiettracker.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.aidiettracker.R
 
-class MainActivity : AppCompatActivity() {
+class ChatbotActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        startActivitySmooth(AuthEntryActivity::class.java)
-        finish()
+        setContentView(R.layout.activity_chatbot)
     }
 }
+

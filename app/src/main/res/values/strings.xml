@@ -15,11 +15,11 @@
 	<string name="auth_register">Create Account</string>
 	<string name="auth_terms">By continuing, you agree to NutriFlow\'s <u>Terms &amp; Conditions</u> and <u>Privacy Policy</u></string>
 	<string name="chatbot_title">NutriFlow AI Coach</string>
-	<string name="chatbot_hint">Ask about meals, calories, protein, hydration...</string>
+	<string name="chatbot_hint">Ask about meals, calories, protein, hydration…</string>
 	<string name="chatbot_send">Send message</string>
 	<string name="chatbot_back">Go back</string>
 	<string name="chatbot_status_ready">Ready</string>
-	<string name="chatbot_status_thinking">Thinking...</string>
+	<string name="chatbot_status_thinking">Thinking…</string>
 	<string name="chatbot_status_empty">No reply generated.</string>
 	<string name="chatbot_status_failed">Request failed.</string>
 	<string name="chatbot_status_timeout">Request timed out. Try a shorter prompt.</string>
@@ -29,4 +29,28 @@
 	<string name="chatbot_error_generic">I could not complete that request. Please try again.</string>
 	<string name="chatbot_error_empty">I did not get a useful response. Please rephrase your question.</string>
 	<string name="chatbot_error_network">Network issue while contacting AI coach. Please check connection and try again.</string>
+
+	<!-- Dashboard + tracker compatibility strings -->
+	<string name="dashboard_title">NutriFlow</string>
+	<string name="dashboard_subtitle">A calm view of calories, meals, and habits</string>
+	<string name="ask_ai_label">Ask AI</string>
+	<string name="complete_profile_label">Complete profile</string>
+	<string name="calorie_goal_label">Calorie goal</string>
+	<string name="left_label">LEFT</string>
+	<string name="eaten_label">EATEN</string>
+	<string name="goal_label">GOAL</string>
+	<string name="streak_label">STREAK</string>
+	<string name="glasses_label">glasses</string>
+	<string name="daily_overview_title">Daily overview</string>
+	<string name="daily_overview_subtitle">Calories, macros, hydration, and sleep in one place</string>
+	<string name="calories_label">Calories</string>
+	<string name="carbs_label">Carbs</string>
+	<string name="protein_label">Protein</string>
+	<string name="fat_label">Fat</string>
+	<string name="suggestions_title">Smart suggestions</string>
+	<string name="suggestions_subtitle">Small actions that help you stay on track</string>
+	<string name="diet_tracker_title">Diet Tracker</string>
+	<string name="calories_remaining_label">Calories remaining</string>
+	<string name="todays_log_title">Today\'s log</string>
+	<string name="delete_meal">Delete meal</string>
 </resources>

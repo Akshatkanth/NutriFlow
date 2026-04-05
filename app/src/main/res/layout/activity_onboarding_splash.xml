@@ -25,7 +25,7 @@
         android:id="@+id/tap_ring"
         android:layout_width="78dp"
         android:layout_height="78dp"
-        android:indeterminate="true"
+        app:indeterminate="true"
         app:indeterminateAnimationType="contiguous"
         app:indicatorColor="@android:color/white"
         app:indicatorSize="78dp"
