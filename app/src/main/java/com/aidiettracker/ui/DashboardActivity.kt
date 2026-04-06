@@ -13,6 +13,7 @@ import com.aidiettracker.R
 import com.aidiettracker.data.NutritionGoalCalculator
 import com.aidiettracker.data.local.LocalProfileStore
 import com.aidiettracker.data.model.BmiCategory
+import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,15 +51,15 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         findViewById<LinearLayout>(R.id.nav_view_plan).setOnClickListener {
-            startActivitySmooth(DietPlanActivity::class.java)
+            startTabActivitySmooth(DietPlanActivity::class.java)
         }
 
         findViewById<LinearLayout>(R.id.nav_track_diet).setOnClickListener {
-            startActivitySmooth(DietTrackerActivity::class.java)
+            startTabActivitySmooth(DietTrackerActivity::class.java)
         }
 
         findViewById<LinearLayout>(R.id.nav_profile).setOnClickListener {
-            startActivitySmooth(ProfilePageActivity::class.java)
+            startTabActivitySmooth(ProfilePageActivity::class.java)
         }
 
         findViewById<FrameLayout>(R.id.nav_quick_actions).setOnClickListener {
@@ -93,7 +94,8 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun bindLiveSummary() {
-        val profile = LocalProfileStore.load(this)
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        val profile = LocalProfileStore.load(this, currentUid)
         if (profile == null) {
             renderEmptySummary()
             return

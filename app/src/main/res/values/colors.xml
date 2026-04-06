@@ -12,7 +12,7 @@
     <color name="surface_card">#CCFFFFFF</color>
     <color name="surface_card_strong">#E6FFFFFF</color>
     <color name="surface_card_border">#80FFFFFF</color>
-    <color name="text_primary">#000000</color>
+    <color name="text_primary">#212121</color>
 
     <color name="chip_selector_bg">#1AFF6B00</color>
 
@@ -25,8 +25,8 @@
     <color name="dark_surface">#1A1A1A</color>
     <color name="dark_card">#222222</color>
     <color name="orange_primary">#54BD4A</color>
-    <color name="orange_light">#8FD9B6</color>
-    <color name="text_secondary">#333333</color>
+    <color name="orange_light">#54BD4A</color>
+    <color name="text_secondary">#757575</color>
 
     <!-- Required by AlertDialogOrange style -->
     <color name="background_dark">#0D0D0D</color>
@@ -34,7 +34,7 @@
     <!-- Onboarding splash tones sampled to match the provided UI -->
     <color name="onboarding_green_top">#317E5C</color>
     <color name="onboarding_green_bottom">#1D6A4A</color>
-    <color name="onboarding_text">#000000</color>
+    <color name="onboarding_text">#212121</color>
     <color name="onboarding_ring">#CFE5DB</color>
 
     <color name="onboarding_cta_green">#54BD4A</color>
@@ -42,9 +42,9 @@
     <color name="onboarding_placeholder_mid">#A17E6D</color>
     <color name="onboarding_placeholder_bottom">#563F36</color>
 
-    <color name="auth_form_bg">#F1EEEA</color>
-    <color name="auth_text_primary">#232323</color>
-    <color name="auth_text_secondary">#747474</color>
-    <color name="auth_divider">#DBD7D2</color>
+    <color name="auth_form_bg">#FFFFFF</color>
+    <color name="auth_text_primary">#212121</color>
+    <color name="auth_text_secondary">#757575</color>
+    <color name="auth_divider">#E0E0E0</color>
     <color name="auth_link_blue">#4A63AA</color>
 </resources>

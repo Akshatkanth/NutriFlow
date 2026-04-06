@@ -28,12 +28,15 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import com.aidiettracker.ui.attachTapFeedback
+import com.aidiettracker.ui.startTabActivitySmooth
 
 data class MealEntry(
     val name: String,
@@ -113,7 +116,7 @@ class DietTrackerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diet_tracker)
         bindViews()
-        currentProfile = LocalProfileStore.load(this)
+        currentProfile = LocalProfileStore.load(this, FirebaseAuth.getInstance().currentUser?.uid)
         loadGoalsFromProfile()
         setupDate()
         loadData()
@@ -127,22 +130,36 @@ class DietTrackerActivity : AppCompatActivity() {
         refreshUI()
     }
 
+    override fun onResume() {
+        super.onResume()
+        currentProfile = LocalProfileStore.load(this, FirebaseAuth.getInstance().currentUser?.uid)
+        loadGoalsFromProfile()
+        refreshFoodSuggestions(etMealName.text?.toString().orEmpty(), forceShow = false)
+        refreshUI()
+    }
+
     private fun bindNavigation() {
         findViewById<LinearLayout>(R.id.nav_home).setOnClickListener {
-            startActivity(Intent(this, com.aidiettracker.ui.DashboardActivity::class.java))
+            startTabActivitySmooth(com.aidiettracker.ui.DashboardActivity::class.java)
         }
         findViewById<LinearLayout>(R.id.nav_view_plan).setOnClickListener {
-            startActivity(Intent(this, com.aidiettracker.ui.DietPlanActivity::class.java))
+            startTabActivitySmooth(com.aidiettracker.ui.DietPlanActivity::class.java)
         }
         findViewById<LinearLayout>(R.id.nav_track_diet).setOnClickListener {
             findViewById<android.widget.ScrollView>(R.id.diet_tracker_scroll).smoothScrollTo(0, 0)
         }
         findViewById<LinearLayout>(R.id.nav_profile).setOnClickListener {
-            startActivity(Intent(this, com.aidiettracker.ui.ProfilePageActivity::class.java))
+            startTabActivitySmooth(com.aidiettracker.ui.ProfilePageActivity::class.java)
         }
         findViewById<android.widget.FrameLayout>(R.id.nav_quick_actions).setOnClickListener {
             openMealEntry()
         }
+
+        findViewById<LinearLayout>(R.id.nav_home).attachTapFeedback()
+        findViewById<LinearLayout>(R.id.nav_view_plan).attachTapFeedback()
+        findViewById<LinearLayout>(R.id.nav_track_diet).attachTapFeedback()
+        findViewById<LinearLayout>(R.id.nav_profile).attachTapFeedback()
+        findViewById<android.widget.FrameLayout>(R.id.nav_quick_actions).attachTapFeedback()
     }
 
     private fun bindViews() {
@@ -191,7 +208,7 @@ class DietTrackerActivity : AppCompatActivity() {
     }
 
     private fun loadGoalsFromProfile() {
-        val profile = currentProfile ?: LocalProfileStore.load(this) ?: return
+        val profile = currentProfile ?: LocalProfileStore.load(this, FirebaseAuth.getInstance().currentUser?.uid) ?: return
         currentProfile = profile
         val goals = NutritionGoalCalculator.calculate(profile)
         dailyCalorieGoal = goals.caloriesTarget
@@ -202,26 +219,30 @@ class DietTrackerActivity : AppCompatActivity() {
 
     private fun setupFoodInputs() {
         val vegOnly = currentProfile?.dietPreference == DietPreference.VEG_ONLY
-        foodSuggestionsAdapter = ArrayAdapter(
-            this,
-            R.layout.item_food_dropdown,
-            FoodLookupService.defaultSuggestions()
-                .filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
-                .toMutableList()
-        )
+        val defaultSuggestions = FoodLookupService.defaultSuggestions()
+            .filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
+
+        foodSuggestionsAdapter = ArrayAdapter(this, R.layout.item_food_dropdown, defaultSuggestions.toMutableList())
         etMealName.setAdapter(foodSuggestionsAdapter)
-        etMealName.setDropDownBackgroundResource(R.drawable.bg_dark_card)
+        etMealName.setDropDownBackgroundResource(R.drawable.bg_dropdown_popup)
         etMealName.threshold = 1
+        etMealName.setOnClickListener {
+            refreshFoodSuggestions(etMealName.text?.toString().orEmpty(), forceShow = true)
+        }
+        etMealName.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                refreshFoodSuggestions(etMealName.text?.toString().orEmpty(), forceShow = true)
+            }
+        }
+        etMealName.setOnItemClickListener { _, _, _, _ ->
+            tvFoodLookupStatus.text = "Food selected. Enter quantity to calculate macros."
+        }
 
         etMealName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val suggestions = FoodLookupService.searchSuggestions(s?.toString().orEmpty())
-                    .filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
-                foodSuggestionsAdapter.clear()
-                foodSuggestionsAdapter.addAll(suggestions)
-                foodSuggestionsAdapter.notifyDataSetChanged()
+                refreshFoodSuggestions(s?.toString().orEmpty(), forceShow = etMealName.hasFocus())
             }
 
             override fun afterTextChanged(s: Editable?) = Unit
@@ -230,11 +251,31 @@ class DietTrackerActivity : AppCompatActivity() {
         val units = listOf("g", "serving", "roti", "bowl", "piece")
         val unitAdapter = ArrayAdapter(this, R.layout.item_food_dropdown, units)
         actQuantityUnit.setAdapter(unitAdapter)
-        actQuantityUnit.setDropDownBackgroundResource(R.drawable.bg_dark_card)
+        actQuantityUnit.setDropDownBackgroundResource(R.drawable.bg_dropdown_popup)
         actQuantityUnit.setOnClickListener { actQuantityUnit.showDropDown() }
         actQuantityUnit.setText("g", false)
 
         bindQuickPickChips()
+    }
+
+    private fun refreshFoodSuggestions(query: String, forceShow: Boolean) {
+        val normalizedQuery = query.trim()
+        val vegOnly = currentProfile?.dietPreference == DietPreference.VEG_ONLY
+        val suggestions = if (normalizedQuery.isEmpty()) {
+            FoodLookupService.defaultSuggestions()
+        } else {
+            FoodLookupService.searchSuggestions(normalizedQuery)
+        }.filter { !vegOnly || FoodLookupService.isVegetarianFoodName(it) }
+
+        foodSuggestionsAdapter.clear()
+        foodSuggestionsAdapter.addAll(suggestions)
+        foodSuggestionsAdapter.notifyDataSetChanged()
+
+        if (forceShow && suggestions.isNotEmpty()) {
+            etMealName.post { etMealName.showDropDown() }
+        } else if (suggestions.isEmpty()) {
+            etMealName.dismissDropDown()
+        }
     }
 
     private fun bindQuickPickChips() {
@@ -660,7 +701,7 @@ class DietTrackerActivity : AppCompatActivity() {
             .putString("meals_$todayKey", jsonArray.toString())
             .putInt("water_$todayKey", waterCount)
             .putInt("water_glasses_$todayKey", waterCount)
-            .apply()
+            .commit()
 
         val lastLogDate = prefs.getString("last_log_date", "")
         val yesterday = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -676,7 +717,7 @@ class DietTrackerActivity : AppCompatActivity() {
             prefs.edit()
                 .putInt("streak_count", newStreak)
                 .putString("last_log_date", todayKey)
-                .apply()
+                .commit()
         }
     }
 

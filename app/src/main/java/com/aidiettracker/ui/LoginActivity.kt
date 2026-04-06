@@ -54,8 +54,7 @@ class LoginActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
-                    startActivitySmooth(DashboardActivity::class.java)
-                    finish()
+                    routeAfterAuth()
                 }
                 .addOnFailureListener { error ->
                     Toast.makeText(this, error.message ?: "Login failed", Toast.LENGTH_LONG).show()
@@ -74,8 +73,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (FirebaseAuth.getInstance().currentUser != null) {
-            startActivitySmooth(DashboardActivity::class.java)
-            finish()
+            routeAfterAuth()
         }
     }
 }

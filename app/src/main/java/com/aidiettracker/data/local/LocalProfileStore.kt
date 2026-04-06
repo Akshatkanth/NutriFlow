@@ -24,9 +24,11 @@ object LocalProfileStore {
     private const val KEY_GOAL = "goal"
     private const val KEY_BMI = "bmi"
     private const val KEY_BMI_CATEGORY = "bmi_category"
+    private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
+    private const val KEY_ONBOARDING_COMPLETED_PREFIX = "onboarding_completed_"
 
     fun save(context: Context, profile: UserProfile) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit(commit = true) {
             putString(KEY_UID, profile.uid)
             putString(KEY_NAME, profile.name)
             putInt(KEY_AGE, profile.age)
@@ -39,24 +41,43 @@ object LocalProfileStore {
             putString(KEY_GOAL, profile.goal.name)
             putFloat(KEY_BMI, profile.bmi.toFloat())
             putString(KEY_BMI_CATEGORY, profile.bmiCategory.name)
+            putBoolean(KEY_ONBOARDING_COMPLETED, true)
+            if (profile.uid.isNotBlank()) {
+                putBoolean(KEY_ONBOARDING_COMPLETED_PREFIX + profile.uid, true)
+            }
         }
     }
 
     fun clear(context: Context) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit(commit = true) {
             clear()
         }
     }
 
-    fun load(context: Context): UserProfile? {
+    fun load(context: Context, expectedUid: String? = null): UserProfile? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val storedUid = prefs.getString(KEY_UID, "") ?: ""
+
         val name = prefs.getString(KEY_NAME, "") ?: ""
         if (name.isBlank()) {
             return null
         }
 
+        val resolvedUid = when {
+            expectedUid.isNullOrBlank() -> storedUid
+            storedUid == expectedUid -> storedUid
+            storedUid.isBlank() -> {
+                prefs.edit(commit = true) {
+                    putString(KEY_UID, expectedUid)
+                    putBoolean(KEY_ONBOARDING_COMPLETED_PREFIX + expectedUid, true)
+                }
+                expectedUid
+            }
+            else -> return null
+        }
+
         return UserProfile(
-            uid = prefs.getString(KEY_UID, "") ?: "",
+            uid = resolvedUid,
             name = name,
             age = prefs.getInt(KEY_AGE, 0),
             heightCm = prefs.getFloat(KEY_HEIGHT_CM, 0f).toDouble(),
@@ -69,6 +90,22 @@ object LocalProfileStore {
             bmi = prefs.getFloat(KEY_BMI, 0f).toDouble(),
             bmiCategory = enumOrDefault(prefs.getString(KEY_BMI_CATEGORY, null), BmiCategory.NORMAL)
         )
+    }
+
+    fun hasCompletedOnboarding(context: Context, uid: String?): Boolean {
+        if (uid.isNullOrBlank()) {
+            return false
+        }
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val storedUid = prefs.getString(KEY_UID, "") ?: ""
+        if (storedUid.isNotBlank() && storedUid != uid) {
+            return false
+        }
+        val explicitCompleted = prefs.getBoolean(
+            KEY_ONBOARDING_COMPLETED_PREFIX + uid,
+            prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        )
+        return explicitCompleted || load(context, uid) != null
     }
 
     private inline fun <reified T : Enum<T>> enumOrDefault(value: String?, default: T): T {

@@ -69,7 +69,12 @@ class RegisterActivity : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show()
-                    startActivitySmooth(ProfileActivity::class.java)
+                    val intent = Intent(this, ProfileActivity::class.java).apply {
+                        putExtra(ProfileActivity.EXTRA_FORCE_ONBOARDING, true)
+                        putExtra(ProfileActivity.EXTRA_PREFILL_NAME, name)
+                    }
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 }
                 .addOnFailureListener { e ->

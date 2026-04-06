@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.NestedScrollView
 import com.aidiettracker.DietTrackerActivity
 import com.aidiettracker.R
 import com.aidiettracker.data.local.LocalProfileStore
@@ -14,6 +15,7 @@ import com.aidiettracker.data.model.ActivityLevel
 import com.aidiettracker.data.model.BodyType
 import com.aidiettracker.data.model.DietPreference
 import com.aidiettracker.data.model.Goal
+import com.google.firebase.auth.FirebaseAuth
 import java.util.Locale
 
 class ProfilePageActivity : AppCompatActivity() {
@@ -40,22 +42,35 @@ class ProfilePageActivity : AppCompatActivity() {
             startActivitySmooth(ProfileActivity::class.java)
         }
 
+        findViewById<View>(R.id.button_edit_personal).setOnClickListener {
+            startActivitySmooth(ProfileActivity::class.java)
+        }
+        findViewById<View>(R.id.button_edit_fitness).setOnClickListener {
+            startActivitySmooth(ProfileActivity::class.java)
+        }
+        findViewById<View>(R.id.button_edit_metrics).setOnClickListener {
+            startActivitySmooth(ProfileActivity::class.java)
+        }
+
         findViewById<View>(R.id.button_edit_profile).attachTapFeedback()
         findViewById<View>(R.id.button_complete_profile).attachTapFeedback()
+        findViewById<View>(R.id.button_edit_personal).attachTapFeedback()
+        findViewById<View>(R.id.button_edit_fitness).attachTapFeedback()
+        findViewById<View>(R.id.button_edit_metrics).attachTapFeedback()
     }
 
     private fun bindNavigation() {
         findViewById<LinearLayout>(R.id.nav_home).setOnClickListener {
-            startActivitySmooth(DashboardActivity::class.java)
+            startTabActivitySmooth(DashboardActivity::class.java)
         }
         findViewById<LinearLayout>(R.id.nav_view_plan).setOnClickListener {
-            startActivitySmooth(DietPlanActivity::class.java)
+            startTabActivitySmooth(DietPlanActivity::class.java)
         }
         findViewById<LinearLayout>(R.id.nav_track_diet).setOnClickListener {
-            startActivity(Intent(this, DietTrackerActivity::class.java))
+            startTabActivitySmooth(DietTrackerActivity::class.java)
         }
         findViewById<LinearLayout>(R.id.nav_profile).setOnClickListener {
-            findViewById<android.widget.ScrollView>(R.id.profile_page_scroll).smoothScrollTo(0, 0)
+            findViewById<NestedScrollView>(R.id.profile_page_scroll).smoothScrollTo(0, 0)
         }
         findViewById<FrameLayout>(R.id.nav_quick_actions).setOnClickListener {
             startActivitySmooth(ProfileActivity::class.java)
@@ -69,7 +84,8 @@ class ProfilePageActivity : AppCompatActivity() {
     }
 
     private fun bindProfile() {
-        val profile = LocalProfileStore.load(this)
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        val profile = LocalProfileStore.load(this, currentUid)
         val completeProfileCta = findViewById<View>(R.id.button_complete_profile)
         val editProfileButton = findViewById<View>(R.id.button_edit_profile)
         val subtitle = findViewById<TextView>(R.id.text_profile_subtitle)
@@ -79,16 +95,16 @@ class ProfilePageActivity : AppCompatActivity() {
             completeProfileCta.visibility = View.VISIBLE
             editProfileButton.visibility = View.GONE
 
-            setText(R.id.text_profile_name, "Name: -")
-            setText(R.id.text_profile_age, "Age: -")
-            setText(R.id.text_profile_goal, "Goal: -")
-            setText(R.id.text_profile_activity, "Activity: -")
-            setText(R.id.text_profile_height, "Height: -")
-            setText(R.id.text_profile_weight, "Weight: -")
-            setText(R.id.text_profile_target_weight, "Target weight: -")
-            setText(R.id.text_profile_diet, "Diet preference: -")
-            setText(R.id.text_profile_body_type, "Body type: -")
-            setText(R.id.text_profile_bmi, "BMI: -")
+            setText(R.id.text_profile_name, "-")
+            setText(R.id.text_profile_age, "-")
+            setText(R.id.text_profile_goal, "-")
+            setText(R.id.text_profile_activity, "-")
+            setText(R.id.text_profile_height, "-")
+            setText(R.id.text_profile_weight, "-")
+            setText(R.id.text_profile_target_weight, "-")
+            setText(R.id.text_profile_diet, "-")
+            setText(R.id.text_profile_body_type, "-")
+            setText(R.id.text_profile_bmi, "-")
             return
         }
 
@@ -96,18 +112,18 @@ class ProfilePageActivity : AppCompatActivity() {
         completeProfileCta.visibility = View.GONE
         editProfileButton.visibility = View.VISIBLE
 
-        setText(R.id.text_profile_name, "Name: ${profile.name}")
-        setText(R.id.text_profile_age, "Age: ${profile.age}")
-        setText(R.id.text_profile_goal, "Goal: ${formatGoal(profile.goal)}")
-        setText(R.id.text_profile_activity, "Activity: ${formatActivity(profile.activityLevel)}")
-        setText(R.id.text_profile_height, "Height: ${profile.heightCm.toInt()} cm")
-        setText(R.id.text_profile_weight, "Weight: ${oneDecimal(profile.weightKg)} kg")
-        setText(R.id.text_profile_target_weight, "Target weight: ${oneDecimal(profile.targetWeightKg)} kg")
-        setText(R.id.text_profile_diet, "Diet preference: ${formatDiet(profile.dietPreference)}")
-        setText(R.id.text_profile_body_type, "Body type: ${formatBodyType(profile.bodyType)}")
+        setText(R.id.text_profile_name, profile.name)
+        setText(R.id.text_profile_age, profile.age.toString())
+        setText(R.id.text_profile_goal, formatGoal(profile.goal))
+        setText(R.id.text_profile_activity, formatActivity(profile.activityLevel))
+        setText(R.id.text_profile_height, "${profile.heightCm.toInt()} cm")
+        setText(R.id.text_profile_weight, "${oneDecimal(profile.weightKg)} kg")
+        setText(R.id.text_profile_target_weight, "${oneDecimal(profile.targetWeightKg)} kg")
+        setText(R.id.text_profile_diet, formatDiet(profile.dietPreference))
+        setText(R.id.text_profile_body_type, formatBodyType(profile.bodyType))
         setText(
             R.id.text_profile_bmi,
-            "BMI: ${oneDecimal(profile.bmi)} (${profile.bmiCategory.name.lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }})"
+            "${oneDecimal(profile.bmi)} (${profile.bmiCategory.name.lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }})"
         )
     }
 

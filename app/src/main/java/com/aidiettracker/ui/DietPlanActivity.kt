@@ -1,7 +1,6 @@
 package com.aidiettracker.ui
 
 import android.os.Bundle
-import android.content.Intent
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -10,19 +9,32 @@ import com.aidiettracker.R
 import com.aidiettracker.data.NutritionGoalCalculator
 import com.aidiettracker.data.ai.AiIndianSuggestor
 import com.aidiettracker.data.local.LocalProfileStore
+import com.google.firebase.auth.FirebaseAuth
 
 class DietPlanActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diet_plan)
 
-        val profile = LocalProfileStore.load(this)
+        bindNavigation()
+
+        renderPlanFromProfile()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        renderPlanFromProfile()
+    }
+
+    private fun renderPlanFromProfile() {
+        val profile = LocalProfileStore.load(this, FirebaseAuth.getInstance().currentUser?.uid)
         if (profile == null) {
             Toast.makeText(this, "Complete your profile first", Toast.LENGTH_SHORT).show()
+            startActivitySmooth(ProfileActivity::class.java)
+            finish()
             return
         }
 
-        bindNavigation()
 
         val goals = NutritionGoalCalculator.calculate(profile)
         val aiPlan = AiIndianSuggestor.buildDietPlan(profile, goals.caloriesTarget)
@@ -37,16 +49,16 @@ class DietPlanActivity : AppCompatActivity() {
 
     private fun bindNavigation() {
         findViewById<android.widget.LinearLayout>(R.id.nav_home).setOnClickListener {
-            startActivitySmooth(DashboardActivity::class.java)
+            startTabActivitySmooth(DashboardActivity::class.java)
         }
         findViewById<android.widget.LinearLayout>(R.id.nav_view_plan).setOnClickListener {
             findViewById<android.widget.ScrollView>(R.id.diet_plan_scroll).smoothScrollTo(0, 0)
         }
         findViewById<android.widget.LinearLayout>(R.id.nav_track_diet).setOnClickListener {
-            startActivitySmooth(com.aidiettracker.DietTrackerActivity::class.java)
+            startTabActivitySmooth(com.aidiettracker.DietTrackerActivity::class.java)
         }
         findViewById<android.widget.LinearLayout>(R.id.nav_profile).setOnClickListener {
-            startActivitySmooth(ProfilePageActivity::class.java)
+            startTabActivitySmooth(ProfilePageActivity::class.java)
         }
         findViewById<android.widget.FrameLayout>(R.id.nav_quick_actions).setOnClickListener {
             showQuickActions()

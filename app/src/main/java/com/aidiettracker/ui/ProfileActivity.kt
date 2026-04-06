@@ -27,6 +27,11 @@ import kotlin.math.round
 
 class ProfileActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_FORCE_ONBOARDING = "extra_force_onboarding"
+        const val EXTRA_PREFILL_NAME = "extra_prefill_name"
+    }
+
     private lateinit var stepViews: List<View>
     private lateinit var textStepHint: TextView
     private lateinit var textQuestion: TextView
@@ -46,11 +51,12 @@ class ProfileActivity : AppCompatActivity() {
     private var existingProfile: UserProfile? = null
 
     private var selectedGoal: Goal? = null
-    private var selectedGender: String? = null
+    private var selectedDietPreference: DietPreference? = null
     private var selectedActivity: ActivityLevel? = null
     private var heightCm: Double? = null
     private var weightKg: Double? = null
     private var targetWeightKg: Double? = null
+    private var prefillName: String? = null
 
     private val profileTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
@@ -94,9 +100,13 @@ class ProfileActivity : AppCompatActivity() {
         inputUnderline = findViewById(R.id.view_input_underline)
         buttonNext = findViewById(R.id.button_save_profile)
 
-        existingProfile = LocalProfileStore.load(this)
+        prefillName = intent.getStringExtra(EXTRA_PREFILL_NAME)?.trim()?.takeIf { it.isNotBlank() }
+
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        existingProfile = LocalProfileStore.load(this, currentUid)
         existingProfile?.let {
             selectedGoal = it.goal
+            selectedDietPreference = it.dietPreference
             selectedActivity = it.activityLevel
             heightCm = it.heightCm.takeIf { h -> h > 0 }
             weightKg = it.weightKg.takeIf { w -> w > 0 }
@@ -143,7 +153,7 @@ class ProfileActivity : AppCompatActivity() {
                 else -> Goal.GAIN
             }
 
-            1 -> selectedGender = if (index == 0) "Female" else "Male"
+            1 -> selectedDietPreference = if (index == 0) DietPreference.VEG_ONLY else DietPreference.NON_VEG
 
             5 -> selectedActivity = when (index) {
                 0 -> ActivityLevel.SEDENTARY
@@ -178,14 +188,14 @@ class ProfileActivity : AppCompatActivity() {
             1 -> {
                 configureStepText(
                     hint = "Great, let's continue.",
-                    question = "What's your gender?",
-                    helper = "We use this information to calculate and provide you with daily personalized recommendations."
+                    question = "What is your diet preference?",
+                    helper = "We'll use this to keep your meal plan and AI suggestions aligned with your food choice."
                 )
-                configureOptions(listOf("Female", "Male"))
+                configureOptions(listOf("Vegetarian", "Non-vegetarian"))
                 applySelectionStyles(
-                    when (selectedGender) {
-                        "Female" -> 0
-                        "Male" -> 1
+                    when (selectedDietPreference) {
+                        DietPreference.VEG_ONLY -> 0
+                        DietPreference.NON_VEG -> 1
                         else -> -1
                     }
                 )
@@ -331,7 +341,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun isStepAnswered(step: Int): Boolean {
         return when (step) {
             0 -> selectedGoal != null
-            1 -> !selectedGender.isNullOrBlank()
+            1 -> selectedDietPreference != null
             2 -> (heightCm ?: 0.0) > 0.0
             3 -> (weightKg ?: 0.0) > 0.0
             4 -> (targetWeightKg ?: 0.0) > 0.0
@@ -352,10 +362,11 @@ class ProfileActivity : AppCompatActivity() {
 
         val existing = existingProfile
         val name = existing?.name?.takeIf { it.isNotBlank() }
+            ?: prefillName
             ?: FirebaseAuth.getInstance().currentUser?.displayName
             ?: "User"
         val age = existing?.age?.takeIf { it > 0 } ?: 25
-        val dietPreference = existing?.dietPreference ?: DietPreference.NON_VEG
+        val dietPreference = selectedDietPreference ?: existing?.dietPreference ?: DietPreference.NON_VEG
 
         val rawBmi = BmiCalculator.calculate(weightKg = finalWeight, heightCm = finalHeight)
         val bmi = round(rawBmi * 10.0) / 10.0

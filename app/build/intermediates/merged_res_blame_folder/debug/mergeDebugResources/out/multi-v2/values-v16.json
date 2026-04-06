@@ -1,0 +1,38 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.aidiettracker.app-mergeDebugResources-34:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Akshat\\.gradle\\caches\\9.3.1\\transforms\\8cdb89530c04f28f9297145f4cabf7a7\\workspace\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Akshat\\.gradle\\caches\\9.3.1\\transforms\\e5b5da1715af28210ee36b2bdf568192\\workspace\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}

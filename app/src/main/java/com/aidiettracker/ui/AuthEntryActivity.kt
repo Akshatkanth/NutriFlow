@@ -25,8 +25,7 @@ class AuthEntryActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (FirebaseAuth.getInstance().currentUser != null) {
-            startActivitySmooth(DashboardActivity::class.java)
-            finish()
+            routeAfterAuth()
         }
     }
 }
