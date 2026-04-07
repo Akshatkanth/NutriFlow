@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_dashboard_root">
+    android:background="@drawable/bg_pages_gradient">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/dashboard_scroll"
@@ -57,24 +57,25 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <TextView
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/text_chat_shortcut"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_dashboard_header_chip"
-                    android:clickable="true"
-                    android:drawableStart="@drawable/ic_chat"
-                    android:drawablePadding="6dp"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:paddingStart="14dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="14dp"
                     android:paddingBottom="8dp"
                     android:text="Ask AI"
+                    android:textAllCaps="false"
                     android:textColor="@color/text_primary"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:backgroundTint="@android:color/transparent"
+                    app:icon="@drawable/ic_chat"
+                    app:iconPadding="6dp"
+                    app:iconTint="@color/text_primary"
+                    app:rippleColor="#22000000" />
             </LinearLayout>
 
             <LinearLayout

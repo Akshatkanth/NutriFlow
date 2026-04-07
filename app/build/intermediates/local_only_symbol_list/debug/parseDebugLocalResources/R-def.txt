@@ -37,6 +37,7 @@ color text_hint
 color text_on_dark
 color text_primary
 color text_secondary
+drawable bg
 drawable bg_alt_row
 drawable bg_app_gradient
 drawable bg_chat_bot_bubble
@@ -62,6 +63,7 @@ drawable bg_onboarding_ring
 drawable bg_orange_banner
 drawable bg_orange_card
 drawable bg_orange_circle
+drawable bg_pages_gradient
 drawable bg_profile_green_circle
 drawable bg_profile_option_card
 drawable bg_profile_option_card_active
@@ -155,6 +157,7 @@ id layout_meals_container
 id layout_messages
 id layout_quick_add_section
 id layout_water_glasses
+id login_row
 id main
 id nav_home
 id nav_profile
@@ -248,6 +251,7 @@ id text_steps_label
 id text_suggestion_one
 id text_suggestion_three
 id text_suggestion_two
+id text_tagline
 id text_terms
 id text_unit
 id text_water_status_value

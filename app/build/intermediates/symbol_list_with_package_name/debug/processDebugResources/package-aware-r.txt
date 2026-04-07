@@ -3028,6 +3028,7 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable bg
 drawable bg_alt_row
 drawable bg_app_gradient
 drawable bg_chat_bot_bubble
@@ -3053,6 +3054,7 @@ drawable bg_onboarding_ring
 drawable bg_orange_banner
 drawable bg_orange_card
 drawable bg_orange_circle
+drawable bg_pages_gradient
 drawable bg_profile_green_circle
 drawable bg_profile_option_card
 drawable bg_profile_option_card_active
@@ -3523,6 +3525,7 @@ id line3
 id linear
 id listMode
 id list_item
+id login_row
 id m3_side_sheet
 id main
 id marquee
@@ -3827,6 +3830,7 @@ id text_steps_label
 id text_suggestion_one
 id text_suggestion_three
 id text_suggestion_two
+id text_tagline
 id text_terms
 id text_unit
 id text_water_status_value
