@@ -1,102 +1,85 @@
-# AI Based Diet Tracker (Android)
+# AI Based Diet Tracker
 
 ## Overview
-AI Based Diet Tracker is an Android app that acts as a virtual diet consultant. It lets users sign up, enter personal details, calculate BMI, receive rule-based diet plans, track daily intake, and view alternative diet suggestions. The backend uses Firebase Authentication and Firebase Firestore.
+AI Based Diet Tracker is an Android app that helps users sign in, complete a personalized profile, calculate BMI, generate a diet plan, track daily nutrition, and chat with an AI coach for practical nutrition advice.
 
-## Core Features
-- User registration & login (Firebase Authentication)
-- Personal profile capture (age, height, weight, body type, activity level, goal)
-- BMI calculation and category classification
-- Rule-based diet plan generation
-- Daily diet tracking (meals, calories, macros)
-- Alternative diet suggestions based on preferences and constraints
+The app is currently built with Kotlin, XML layouts, Firebase Authentication, local profile storage, and an NVIDIA NIM-backed chat assistant.
 
-## Suggested App Architecture
-- **UI**: XML layouts + Activity/Fragment + ViewModel
-- **State**: MVVM with LiveData or StateFlow
-- **Data**: Repository pattern for Firestore + local cache (Room optional)
-- **Services**: Firebase Auth, Firebase Firestore
+## Current App State
+The app is fully wired around a signed-in user flow:
 
-## Screen Map
-1. **Splash / Auth Gate**
-2. **Login**
-3. **Register**
-4. **Profile Setup** (personal details + goals)
-5. **Dashboard** (BMI summary + today’s plan)
-6. **Diet Plan** (generated plan + alternatives)
-7. **Diet Tracker** (meals logged per day)
-8. **Settings / Profile**
+1. Splash and auth entry open first.
+2. Returning users are routed straight into the app when a saved profile exists.
+3. New users complete onboarding questions once, then their profile is saved locally.
+4. The dashboard shows live calorie, macro, hydration, sleep, meal, and streak summaries.
+5. The profile page shows saved data, edit actions, and a logout button.
 
-## Data Model (Firestore)
-- **users/{uid}**
-  - name
-  - age
-  - heightCm
-  - weightKg
-  - bodyType (Ectomorph/Mesomorph/Endomorph)
-  - activityLevel (Sedentary/Light/Moderate/Active)
-  - goal (Lose/Maintain/Gain)
-  - bmi
-  - bmiCategory
-  - createdAt
-- **users/{uid}/dietPlans/{planId}**
-  - planName
-  - caloriesTarget
-  - macroTargets (protein, carbs, fat)
-  - meals (breakfast/lunch/dinner/snacks)
-  - alternatives
-  - createdAt
-- **users/{uid}/dietLogs/{logId}**
-  - date
-  - meals (list)
-  - totalCalories
-  - totalMacros
+## What the App Does Today
+- Email/password sign-in and registration with Firebase Authentication.
+- First-time profile onboarding for goal, diet preference, height, weight, target weight, and activity level.
+- Saved profile display with BMI and category.
+- Dashboard summary with calories remaining, macro progress, water, sleep, meals logged, and streak.
+- Rule-based diet plan generation from the saved profile.
+- Daily diet tracking for meals, calories, macros, water, and sleep.
+- AI coach chat powered by NVIDIA NIM when the API key is configured.
+- Profile editing by section, plus logout from the profile page.
+- Lightweight local persistence so returning users keep their profile data on the device.
 
-## BMI Logic
-- BMI = weightKg / (heightM^2)
-- Categories:
-  - Underweight: < 18.5
-  - Normal: 18.5–24.9
-  - Overweight: 25–29.9
-  - Obese: >= 30
+## Main Screens
+1. Onboarding splash
+2. Auth entry
+3. Login
+4. Register
+5. Profile setup / onboarding
+6. Dashboard
+7. Diet plan
+8. Diet tracker
+9. Chat coach
+10. Profile page
+11. Profile edit
 
-## Rule-Based Diet Plan (Example)
-- If BMI = Underweight and goal = Gain:
-  - Higher calories + protein
-- If BMI = Normal and goal = Maintain:
-  - Balanced calories + macros
-- If BMI = Overweight/Obese and goal = Lose:
-  - Calorie deficit + higher protein + lower sugar
+## Data and Storage
+- Firebase Authentication is used for sign-in state.
+- Profile data is stored locally through `SharedPreferences` via `LocalProfileStore`.
+- Daily tracking data is stored locally on the device for calories, meals, macros, water, and sleep.
+- The chat screen calls an NVIDIA NIM chat endpoint using the API key from `local.properties`.
+- The project includes Firestore dependencies, but the current user flow is centered on local profile persistence.
 
-## Firebase Setup Checklist
-1. Create Firebase project
-2. Enable Email/Password Authentication
-3. Create Firestore database (production or test mode)
-4. Download `google-services.json`
-5. Add Firebase dependencies in `build.gradle`
+## Key Logic
+- BMI is calculated from weight and height, then classified into standard BMI categories.
+- Diet goals are calculated from the saved profile.
+- The dashboard and diet plan are driven by the stored profile and today’s logged data.
+- If a signed-in user already has saved profile data, the app skips onboarding and goes straight to the dashboard.
 
-## Download the Project
-1. Open a terminal on your computer.
-2. Clone the GitHub repository:
-   ```bash
-   git clone https://github.com/<your-username>/<your-repo>.git
-   ```
-3. Enter the project folder:
-   ```bash
-   cd <your-repo>
-   ```
+## Tech Stack
+- Kotlin
+- XML layouts
+- AndroidX
+- Material Components
+- Firebase Authentication
+- Firebase Firestore dependency
+- Retrofit
+- NVIDIA NIM API integration
 
-## Next Implementation Steps
-- Scaffold Android Studio project (Kotlin, XML)
-- Create Auth flow and profile setup
-- Add BMI logic + rule engine
-- Build diet plan and tracking screens
-- Persist data in Firestore
+## Project Structure
+- `app/src/main/java/com/aidiettracker/ui/` contains the activities and UI helpers.
+- `app/src/main/java/com/aidiettracker/data/` contains BMI, goal, and diet logic.
+- `app/src/main/java/com/aidiettracker/data/local/` contains the local profile store.
+- `app/src/main/res/layout/` contains the screen layouts.
+- `app/src/main/res/drawable/` contains the card, background, and icon assets.
 
-## Local Build (Android Studio)
+## Setup
 1. Open the project in Android Studio.
-2. Add your Firebase `google-services.json` file to the `app/` directory.
-3. Sync Gradle and run on an emulator or device.
+2. Add your Firebase `google-services.json` file to `app/`.
+3. Add `NIM_API_KEY` to `local.properties` if you want the AI coach to work.
+4. Sync Gradle.
+5. Run the app on an emulator or device.
+
+## Build Details
+- `compileSdk`: 34
+- `minSdk`: 24
+- `targetSdk`: 34
+- Kotlin JVM target: 17
 
 ## Notes
-This application provides guidance and should not replace professional medical advice.
+This app provides nutrition guidance and should not replace professional medical advice.
