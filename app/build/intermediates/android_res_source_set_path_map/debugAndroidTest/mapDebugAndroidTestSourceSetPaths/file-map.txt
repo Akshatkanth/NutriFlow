@@ -1,0 +1,5 @@
+com.aidiettracker.test.app-androidTest-0 C:\Users\Akshat\StudioProjects\AI-Diet-Tracker\app\build\generated\res\resValues\androidTest\debug
+com.aidiettracker.test.app-updated_navigation_xml-1 C:\Users\Akshat\StudioProjects\AI-Diet-Tracker\app\build\generated\updated_navigation_xml\debugAndroidTest
+com.aidiettracker.test.app-mergeDebugAndroidTestResources-2 C:\Users\Akshat\StudioProjects\AI-Diet-Tracker\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.aidiettracker.test.app-mergeDebugAndroidTestResources-3 C:\Users\Akshat\StudioProjects\AI-Diet-Tracker\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.aidiettracker.test.app-debugAndroidTest-4 C:\Users\Akshat\StudioProjects\AI-Diet-Tracker\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
